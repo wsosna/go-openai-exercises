@@ -23,8 +23,8 @@ func getAndValidateVariables() (string, string) {
 	return dir, tmp
 }
 
-// transcript transcribes all mp3 files in the directory specified by TRANSCRIPTION_DIR_PATH.
-func transcript() {
+// transcriptAndSaveToFiles transcribes all mp3 files in the directory specified by TRANSCRIPTION_DIR_PATH.
+func transcriptAndSaveToFiles() {
 	dir, tmp := getAndValidateVariables()
 	// Header
 	start := time.Now()

@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func answer() {
+func analyseFilesAndFindAddress() {
 	client := openai.NewClient()
 	recordings := readRecordings()
 	message := createMessage(recordings)

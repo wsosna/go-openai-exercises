@@ -7,8 +7,8 @@ import (
 
 func RunExercise() {
 	loadEnvFile()
-	transcript()
-	answer()
+	transcriptAndSaveToFiles()
+	analyseFilesAndFindAddress()
 }
 
 func loadEnvFile() {

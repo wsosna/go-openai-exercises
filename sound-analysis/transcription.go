@@ -32,7 +32,6 @@ func transcriptAndSaveToFiles() {
 	log.Println(fmt.Sprintf("Begin analisis of mp3 files in directory: `%v`", dir))
 	log.Println(fmt.Sprintf("All models thoughts are saved in `%v`", thoughtsPath))
 
-	client := openai.NewClient()
 	entries, _ := os.ReadDir(dir)
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -40,18 +39,9 @@ func transcriptAndSaveToFiles() {
 		}
 		outputPath := fmt.Sprintf("%v/sound-analysis/output-%v.txt", tmp, entry.Name())
 		log.Println(fmt.Sprintf("Reading: `%v`", entry.Name()))
-		reader, err := utils.ReadFileToBuffer(dir + "/" + entry.Name())
-		utils.HandleFatalError(err)
-		body := openai.AudioTranscriptionNewParams{
-			File:     openai.FileParam(reader, entry.Name(), "audio/mp4"),
-			Model:    openai.F(openai.AudioModelWhisper1),
-			Language: openai.F("pl"),
-			Prompt:   openai.F(SystemPromptTranscript),
-		}
-		transcription, err := client.Audio.Transcriptions.New(context.TODO(), body)
-		utils.HandleFatalError(err)
+		text := Transcript(fmt.Sprintf("%v/%v", dir, entry.Name()), "en")
 
-		err = utils.WriteStringToFile(transcription.Text, outputPath)
+		err := utils.WriteStringToFile(text, outputPath)
 		utils.HandleFatalError(err)
 		log.Println(fmt.Sprintf("Transcription saved to: `%v`", outputPath))
 	}
@@ -63,4 +53,22 @@ func transcriptAndSaveToFiles() {
 		start.Format("2006-01-02-15:04:05:456"),
 		stop.Format("2006-01-02-15:04:05:456"),
 		stop.Sub(start).Milliseconds()))
+}
+
+// Transcript
+// file is a path to a file that should be transcript.
+func Transcript(file string, language string) string {
+	client := openai.NewClient()
+	reader, err := utils.ReadFileToBuffer(file)
+	utils.HandleFatalError(err)
+	body := openai.AudioTranscriptionNewParams{
+		File:     openai.FileParam(reader, file, "audio/mp4"),
+		Model:    openai.F(openai.AudioModelWhisper1),
+		Language: openai.F(language),
+		Prompt:   openai.F(utils.SystemPromptTranscript),
+	}
+	transcription, err := client.Audio.Transcriptions.New(context.TODO(), body)
+	utils.HandleFatalError(err)
+
+	return transcription.Text
 }

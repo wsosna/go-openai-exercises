@@ -1,30 +1,21 @@
 package sound_analysis
 
 import (
-	"context"
 	"github.com/openai/openai-go"
+	my_ai "go-openai-exercises/my-ai"
 	"go-openai-exercises/utils"
 	"log"
 	"os"
 )
 
 func analyseFilesAndFindAddress() {
-	client := openai.NewClient()
 	recordings := readRecordings()
 	message := createMessage(recordings)
 
-	body := openai.ChatCompletionNewParams{
-		Model: openai.F(openai.ChatModelGPT4),
-		Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
-			openai.SystemMessage(SystemPromptAnalyser),
-			openai.UserMessage(message),
-		}),
-	}
-
-	response, err := client.Chat.Completions.New(context.Background(), body)
-	utils.HandleFatalError(err)
+	ai := my_ai.NewOpenAiWrapper()
+	answer := ai.AskMyAI(utils.SystemPromptAnalyser, message, openai.ChatModelGPT4)
 	log.Println("Received answer from a model:")
-	log.Println(response.Choices[0].Message.Content)
+	log.Println(answer)
 }
 
 // Answer This function assumes that transcription was already executed and will look for files in the directory.

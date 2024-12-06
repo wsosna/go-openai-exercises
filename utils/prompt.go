@@ -1,4 +1,4 @@
-package sound_analysis
+package utils
 
 const SystemPromptTranscript = `
 <system>
